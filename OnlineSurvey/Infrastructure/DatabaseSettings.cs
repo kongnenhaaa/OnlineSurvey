@@ -13,5 +13,5 @@ public sealed class RedisSettings
 
 public sealed class AuthDatabaseSettings
 {
-    public string DatabaseName { get; set; } = "OnlineSurveyAuth";
+    public string DatabaseName { get; set; } = "OnlineSurvey";
 }

@@ -1,0 +1,38 @@
+# Visual Studio and .NET
+.vs/
+**/bin/
+**/obj/
+*.user
+*.suo
+*.userosscache
+*.sln.docstates
+
+# Build and test output
+publish/
+artifacts/
+TestResults/
+
+# Logs and temporary files
+*.log
+*.tmp
+*.bak
+*.swp
+
+# Local database data
+database/data/
+database/dump/
+MongoDB/data/
+Redis/data/
+
+# Local environment overrides and secrets
+.env
+.env.*
+!.env.example
+appsettings.Local.json
+appsettings.Production.json
+
+# Operating system files
+.DS_Store
+Thumbs.db
+desktop.ini
+
