@@ -1,0 +1,12 @@
+@model Survey
+@{
+    ViewData["Title"] = "Đã gửi câu trả lời";
+}
+
+<div class="result-state">
+    <div class="result-icon result-icon-success">✓</div>
+    <span class="eyebrow">Gửi thành công</span>
+    <h1 class="display-6 fw-bold">Cảm ơn bạn!</h1>
+    <p class="lead text-secondary mb-4">Câu trả lời cho khảo sát “@Model.Title” đã được ghi nhận.</p>
+    <a class="btn btn-primary" asp-controller="Home" asp-action="Index">Về trang chủ</a>
+</div>

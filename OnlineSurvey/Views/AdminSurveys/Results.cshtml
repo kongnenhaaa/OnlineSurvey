@@ -1,0 +1,55 @@
+@model SurveyResultsViewModel
+@{
+    ViewData["Title"] = "Kết quả khảo sát";
+}
+
+<div class="d-flex flex-wrap justify-content-between align-items-end gap-3 mb-4" data-reveal>
+    <div>
+        <span class="eyebrow">Báo cáo khảo sát</span>
+        <h1 class="display-6 fw-bold mb-1">@Model.Survey.Title</h1>
+        <p class="text-secondary mb-0">Theo dõi lựa chọn và các phản hồi dạng văn bản.</p>
+    </div>
+    <div class="d-flex gap-2">
+        <a class="btn btn-outline-primary" asp-action="Export" asp-route-id="@Model.Survey.Id">↓ Tải CSV</a>
+        <a class="btn btn-outline-secondary" asp-action="Index">Quay lại</a>
+    </div>
+</div>
+
+<div class="row g-3 mb-4">
+    <div class="col-sm-4"><div class="metric-card metric-card-primary" data-reveal style="--reveal-delay: 50ms"><div class="metric-label">Lượt trả lời</div><div class="metric-value" data-counter="@Model.TotalResponses">@Model.TotalResponses</div></div></div>
+    <div class="col-sm-4"><div class="metric-card metric-card-success" data-reveal style="--reveal-delay: 100ms"><div class="metric-label">Câu hỏi</div><div class="metric-value" data-counter="@Model.Questions.Count">@Model.Questions.Count</div></div></div>
+    <div class="col-sm-4"><div class="metric-card metric-card-violet" data-reveal style="--reveal-delay: 150ms"><div class="metric-label">Phiên bản form</div><div class="metric-value" data-counter="@Model.Survey.Version">@Model.Survey.Version</div></div></div>
+</div>
+
+@foreach (var result in Model.Questions)
+{
+    <div class="result-card p-4 mb-3" data-reveal style="--reveal-delay: @(Math.Min(result.Question.Order * 45, 270))ms">
+        <div class="d-flex justify-content-between gap-3 mb-3">
+            <h2 class="h5 mb-0"><span class="text-secondary me-1">@result.Question.Order.</span>@result.Question.Text</h2>
+            <span class="badge text-bg-light">@(result.Question.Type switch { "single_choice" => "Chọn một", "multiple_choice" => "Chọn nhiều", "textarea" => "Trả lời dài", _ => "Trả lời ngắn" })</span>
+        </div>
+        @if (result.Options.Count > 0)
+        {
+            foreach (var option in result.Options)
+            {
+                var percent = Model.TotalResponses == 0 ? 0 : (int)Math.Round(option.Count * 100.0 / Model.TotalResponses);
+                <div class="mb-3">
+                    <div class="d-flex justify-content-between small mb-1"><span>@option.Text</span><strong>@option.Count <span class="text-secondary fw-normal">(@percent%)</span></strong></div>
+                    <div class="progress"><div class="progress-bar" role="progressbar" style="width: @percent%" aria-valuenow="@percent" aria-valuemin="0" aria-valuemax="100"></div></div>
+                </div>
+            }
+        }
+        else if (result.TextAnswers.Count > 0)
+        {
+            <div class="list-group list-group-flush">@foreach (var answer in result.TextAnswers) { <div class="list-group-item px-0">@answer</div> }</div>
+            @if (result.TextAnswers.Count == 20)
+            {
+                <p class="small text-secondary mt-3 mb-0">Đang hiển thị 20 phản hồi gần nhất. Tải CSV để xem toàn bộ.</p>
+            }
+        }
+        else
+        {
+            <p class="text-secondary mb-0">Chưa có câu trả lời.</p>
+        }
+    </div>
+}

@@ -1,0 +1,31 @@
+@model LoginViewModel
+@{
+    ViewData["Title"] = "Đăng nhập quản trị";
+}
+
+<div class="auth-card auth-card-elevated" data-reveal>
+    <span class="eyebrow">Khu vực quản trị</span>
+    <h1 class="h3 fw-bold mb-2">Chào mừng trở lại</h1>
+    <p class="text-secondary mb-4">Đăng nhập để tạo và theo dõi khảo sát của bạn.</p>
+    <form asp-action="Login" method="post">
+        @Html.AntiForgeryToken()
+        <input asp-for="ReturnUrl" type="hidden" />
+        <div asp-validation-summary="ModelOnly" class="text-danger mb-3"></div>
+        <div class="mb-3">
+            <label asp-for="Username" class="form-label fw-semibold"></label>
+            <input asp-for="Username" class="form-control" autocomplete="username" placeholder="Tên đăng nhập" />
+            <span asp-validation-for="Username" class="text-danger small"></span>
+        </div>
+        <div class="mb-4">
+            <label asp-for="Password" class="form-label fw-semibold"></label>
+            <input asp-for="Password" class="form-control" autocomplete="current-password" placeholder="Mật khẩu" />
+            <span asp-validation-for="Password" class="text-danger small"></span>
+        </div>
+        <button class="btn btn-primary w-100 py-2" type="submit">Đăng nhập <span aria-hidden="true">→</span></button>
+    </form>
+    <div class="small text-secondary mt-4 p-3 bg-light rounded-3">Tài khoản demo: <strong>admin</strong> / <strong>Admin@12345</strong></div>
+</div>
+
+@section Scripts {
+    <partial name="_ValidationScriptsPartial" />
+}

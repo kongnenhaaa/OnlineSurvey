@@ -1,0 +1,90 @@
+@model SurveyPageViewModel
+@{
+    ViewData["Title"] = Model.Survey.Title;
+    var questionCount = Model.Survey.Questions.Count;
+}
+
+<div class="row justify-content-center">
+    <div class="col-xl-8 col-lg-9">
+        <div class="result-card overflow-hidden mb-4" data-reveal>
+            <div class="survey-cover">
+                <span class="eyebrow">Khảo sát trực tuyến</span>
+                <h1 class="display-6 fw-bold mb-2">@Model.Survey.Title</h1>
+                @if (!string.IsNullOrWhiteSpace(Model.Survey.Description))
+                {
+                    <p class="lead mb-0">@Model.Survey.Description</p>
+                }
+            </div>
+            <div class="px-4 py-3 bg-white d-flex flex-wrap justify-content-between gap-2 small text-secondary">
+                <span><strong>@questionCount</strong> câu hỏi</span>
+                <span>Thời gian khoảng @(Math.Max(1, (int)Math.Ceiling(questionCount * 0.4))) phút</span>
+                <span><span class="required-star">*</span> Câu hỏi bắt buộc</span>
+            </div>
+        </div>
+
+        <form asp-controller="Surveys" asp-action="Submit" asp-route-id="@Model.Survey.Id" method="post" data-survey-form>
+            @Html.AntiForgeryToken()
+            <div asp-validation-summary="All" class="alert alert-danger"></div>
+
+            <section class="survey-question" data-reveal>
+                <label asp-for="SubmitModel.RespondentName" class="form-label fw-semibold">Tên người trả lời <span class="text-secondary fw-normal">(không bắt buộc)</span></label>
+                <input asp-for="SubmitModel.RespondentName" class="form-control" maxlength="120" placeholder="Nhập tên của bạn nếu muốn" />
+            </section>
+
+            @foreach (var question in Model.Survey.Questions.OrderBy(x => x.Order))
+            {
+                <section class="survey-question" data-required="@question.Required" data-reveal style="--reveal-delay: @(Math.Min(question.Order * 45, 270))ms">
+                    <label class="form-label fw-semibold mb-3" for="question-@question.Id">
+                        <span class="text-secondary me-1">@question.Order.</span>@question.Text
+                        @if (question.Required)
+                        {
+                            <span class="required-star" aria-label="bắt buộc">*</span>
+                        }
+                    </label>
+                    @if (question.Type == "textarea")
+                    {
+                        <textarea class="form-control" id="question-@question.Id" name="Answers[@question.Id]" rows="5" maxlength="5000" placeholder="Nhập câu trả lời của bạn..."></textarea>
+                    }
+                    else if (question.Type == "single_choice")
+                    {
+                        <div class="choice-list" id="question-@question.Id">
+                            @foreach (var option in question.Options)
+                            {
+                                <label class="choice-option" for="@question.Id-@option.Id">
+                                    <input type="radio" name="Answers[@question.Id]" value="@option.Id" id="@question.Id-@option.Id" />
+                                    <span>@option.Text</span>
+                                </label>
+                            }
+                        </div>
+                    }
+                    else if (question.Type == "multiple_choice")
+                    {
+                        <div class="choice-list" id="question-@question.Id">
+                            @foreach (var option in question.Options)
+                            {
+                                <label class="choice-option" for="@question.Id-@option.Id">
+                                    <input type="checkbox" name="Answers[@question.Id]" value="@option.Id" id="@question.Id-@option.Id" />
+                                    <span>@option.Text</span>
+                                </label>
+                            }
+                        </div>
+                    }
+                    else
+                    {
+                        <input class="form-control" id="question-@question.Id" type="text" name="Answers[@question.Id]" maxlength="5000" placeholder="Nhập câu trả lời của bạn..." />
+                    }
+                    <div class="question-error text-danger small mt-2" data-error-for="@question.Id"></div>
+                </section>
+            }
+
+            <div class="submit-bar" data-reveal>
+                <span class="small text-secondary">Câu trả lời của bạn sẽ được lưu an toàn.</span>
+                <button class="btn btn-primary btn-lg px-4" type="submit">Gửi câu trả lời <span aria-hidden="true">→</span></button>
+            </div>
+        </form>
+    </div>
+</div>
+
+@section Scripts {
+    <script src="~/js/survey-form.js" asp-append-version="true"></script>
+}

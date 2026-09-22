@@ -1,0 +1,74 @@
+@{
+    ViewData["Title"] = "Tạo khảo sát dễ dàng";
+}
+
+<section class="hero-panel mb-4" data-reveal>
+    <div class="hero-grid">
+        <div class="hero-actions">
+            <span class="eyebrow">Nền tảng khảo sát nội bộ</span>
+            <h1 class="display-4 fw-bold mb-3">Biến ý kiến thành quyết định tốt hơn.</h1>
+            <p class="lead mb-4">Tạo form linh hoạt, chia sẻ đường dẫn và xem kết quả tập trung trong một quy trình gọn gàng.</p>
+            <div class="d-flex flex-wrap gap-2">
+                <a class="btn btn-light btn-lg px-4" asp-controller="AdminSurveys" asp-action="Index">Mở trang quản trị <span aria-hidden="true">→</span></a>
+                <a class="btn btn-outline-light btn-lg px-4" href="#features">Xem tính năng</a>
+            </div>
+            <div class="hero-tags mt-4" aria-label="Công nghệ nổi bật">
+                <span><i aria-hidden="true"></i>4 loại câu hỏi</span>
+                <span><i aria-hidden="true"></i>MongoDB linh hoạt</span>
+                <span><i aria-hidden="true"></i>Redis chống spam</span>
+            </div>
+        </div>
+        <div class="hero-visual" aria-hidden="true">
+            <div class="hero-preview-card">
+                <div class="hero-preview-head"><span></span><span></span><span></span><strong>Phản hồi trực tiếp</strong></div>
+                <div class="hero-preview-stat"><small>Lượt trả lời</small><b>1,284</b><em>+18%</em></div>
+                <div class="hero-preview-chart">
+                    <span style="--bar-height: 34%"></span><span style="--bar-height: 55%"></span><span style="--bar-height: 46%"></span><span style="--bar-height: 74%"></span><span style="--bar-height: 61%"></span><span style="--bar-height: 92%"></span><span style="--bar-height: 82%"></span>
+                </div>
+                <div class="hero-preview-foot"><span>Đang cập nhật</span><strong>15 khảo sát mở</strong></div>
+            </div>
+            <div class="hero-float-card hero-float-top"><span>✓</span> Đã lưu phản hồi</div>
+            <div class="hero-float-card hero-float-bottom"><span>⚡</span> Redis cache hoạt động</div>
+        </div>
+    </div>
+</section>
+
+<section id="features" class="mb-5">
+    <div class="row g-3">
+        <div class="col-md-4">
+            <div class="feature-card" data-reveal style="--reveal-delay: 60ms">
+                <span class="feature-icon" aria-hidden="true"><svg viewBox="0 0 24 24"><path d="M12 3v18M3 12h18M6.5 6.5l11 11M17.5 6.5l-11 11" /></svg></span>
+                <h2 class="h5">Form động</h2>
+                <p class="text-secondary mb-0">Tạo câu hỏi ngắn, dài, chọn một hoặc chọn nhiều mà không cần sửa code.</p>
+            </div>
+        </div>
+        <div class="col-md-4">
+            <div class="feature-card" data-reveal style="--reveal-delay: 120ms">
+                <span class="feature-icon" aria-hidden="true"><svg viewBox="0 0 24 24"><ellipse cx="12" cy="6" rx="7" ry="3" /><path d="M5 6v6c0 1.7 3.1 3 7 3s7-1.3 7-3V6M5 12v6c0 1.7 3.1 3 7 3s7-1.3 7-3v-6" /></svg></span>
+                <h2 class="h5">Dữ liệu linh hoạt</h2>
+                <p class="text-secondary mb-0">MongoDB lưu trọn cấu trúc khảo sát và từng phiên bản câu trả lời.</p>
+            </div>
+        </div>
+        <div class="col-md-4">
+            <div class="feature-card" data-reveal style="--reveal-delay: 180ms">
+                <span class="feature-icon" aria-hidden="true"><svg viewBox="0 0 24 24"><path d="M13 2 5 14h7l-1 8 8-12h-7l1-8Z" /></svg></span>
+                <h2 class="h5">Nhanh và an toàn hơn</h2>
+                <p class="text-secondary mb-0">Redis cache form truy cập nhiều và bảo vệ endpoint gửi khỏi spam cơ bản.</p>
+            </div>
+        </div>
+    </div>
+</section>
+
+<section class="row align-items-center g-4" data-reveal>
+    <div class="col-lg-7">
+        <span class="eyebrow">Bắt đầu trong vài phút</span>
+        <h2 class="fw-bold">Một nơi để tạo, chia sẻ và đọc kết quả.</h2>
+        <p class="text-secondary">Sau khi đăng nhập, bạn có thể tạo khảo sát bằng trình dựng trực quan. Khi xuất bản, chỉ cần gửi đường dẫn cho người trả lời.</p>
+    </div>
+    <div class="col-lg-5">
+        <div class="metric-card d-flex align-items-center justify-content-between">
+            <div><div class="metric-label">Loại câu hỏi</div><div class="metric-value">04</div></div>
+            <div class="text-end text-secondary small">Ngắn · dài<br />Một lựa chọn · nhiều lựa chọn</div>
+        </div>
+    </div>
+</section>

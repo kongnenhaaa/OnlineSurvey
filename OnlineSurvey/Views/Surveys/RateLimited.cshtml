@@ -1,0 +1,13 @@
+@model Survey
+@{
+    Context.Response.StatusCode = 429;
+    ViewData["Title"] = "Tạm giới hạn gửi";
+}
+
+<div class="result-state">
+    <div class="result-icon result-icon-warning">!</div>
+    <span class="eyebrow">Tạm thời bị giới hạn</span>
+    <h1 class="display-6 fw-bold">Bạn gửi hơi nhanh</h1>
+    <p class="lead text-secondary">Khảo sát “@Model.Title” chỉ nhận tối đa 3 lượt gửi trong một phút từ cùng một thiết bị.</p>
+    <a class="btn btn-primary" asp-controller="Surveys" asp-action="Details" asp-route-slug="@Model.Slug">Quay lại khảo sát</a>
+</div>

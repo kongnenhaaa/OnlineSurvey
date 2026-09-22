@@ -1,0 +1,86 @@
+@model SurveyEditorViewModel
+@{
+    var isEdit = !string.IsNullOrWhiteSpace(Model.Id);
+    ViewData["Title"] = isEdit ? "Sửa khảo sát" : "Tạo khảo sát";
+}
+
+<div class="d-flex flex-wrap justify-content-between align-items-end gap-3 mb-4" data-reveal>
+    <div>
+        <span class="eyebrow">@(isEdit ? "Chỉnh sửa nội dung" : "Khảo sát mới")</span>
+        <h1 class="display-6 fw-bold mb-1">@(isEdit ? "Sửa khảo sát" : "Tạo khảo sát")</h1>
+        <p class="text-secondary mb-0">Thiết kế câu hỏi, xem trước và lưu lại khi sẵn sàng.</p>
+    </div>
+    <a class="btn btn-outline-secondary" asp-action="Index">Quay lại danh sách</a>
+</div>
+
+<form asp-action="@(isEdit ? "Edit" : "Create")" asp-route-id="@Model.Id" method="post" id="surveyEditorForm">
+    @Html.AntiForgeryToken()
+    <input asp-for="Id" type="hidden" />
+    <input asp-for="QuestionsJson" type="hidden" id="QuestionsJson" />
+    <div asp-validation-summary="All" class="alert alert-danger"></div>
+
+    <div class="editor-layout">
+        <div>
+            <div class="editor-card mb-4" data-reveal>
+                <div class="card-body">
+                    <div class="d-flex justify-content-between align-items-center mb-3">
+                        <div><h2 class="h5 mb-1">Thông tin cơ bản</h2><p class="small text-secondary mb-0">Những gì người trả lời sẽ nhìn thấy đầu tiên.</p></div>
+                        <span class="badge text-bg-light">@(isEdit ? $"Phiên bản {Model.Version}" : "Bản nháp")</span>
+                    </div>
+                    <div class="row g-3">
+                        <div class="col-md-8">
+                            <label asp-for="Title" class="form-label fw-semibold"></label>
+                            <input asp-for="Title" class="form-control form-control-lg" placeholder="Ví dụ: Khảo sát chất lượng môn học" />
+                            <span asp-validation-for="Title" class="text-danger small"></span>
+                        </div>
+                        <div class="col-md-4">
+                            <label asp-for="Slug" class="form-label fw-semibold"></label>
+                            <input asp-for="Slug" class="form-control" placeholder="tu-dong-theo-ten" />
+                            <div class="form-text">Chỉ dùng chữ, số và dấu gạch ngang.</div>
+                            <span asp-validation-for="Slug" class="text-danger small"></span>
+                        </div>
+                        <div class="col-12">
+                            <label asp-for="Description" class="form-label fw-semibold"></label>
+                            <textarea asp-for="Description" class="form-control" rows="3" placeholder="Nói ngắn gọn mục đích của khảo sát..."></textarea>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="d-flex flex-wrap justify-content-between align-items-center gap-2 mb-3" data-reveal>
+                <div><h2 class="h5 mb-1">Câu hỏi</h2><span class="small text-secondary" id="builderCount">0 câu hỏi</span></div>
+                <div class="d-flex flex-wrap gap-2">
+                    <button type="button" class="btn btn-sm btn-outline-secondary" data-add-type="text">+ Câu ngắn</button>
+                    <button type="button" class="btn btn-sm btn-outline-secondary" data-add-type="single_choice">+ Chọn một</button>
+                    <button type="button" class="btn btn-sm btn-primary" id="addQuestion">+ Thêm câu hỏi</button>
+                </div>
+            </div>
+            <div id="questionBuilder" class="mb-4"></div>
+
+            <div class="d-flex flex-wrap gap-2">
+                <button type="submit" class="btn btn-primary px-4">Lưu khảo sát</button>
+                <a class="btn btn-outline-secondary" asp-action="Index">Hủy</a>
+            </div>
+        </div>
+
+        <aside class="editor-side">
+            <div class="editor-card" data-reveal>
+                <div class="card-body">
+                    <span class="eyebrow">Xem nhanh</span>
+                    <h2 class="h5 mb-1" id="previewTitle">@(string.IsNullOrWhiteSpace(Model.Title) ? "Tên khảo sát" : Model.Title)</h2>
+                    <p class="small text-secondary mb-3"><span id="previewCount">0 câu hỏi</span> · form công khai</p>
+                    <div id="previewQuestions"><p class="small text-secondary mb-0" id="previewEmpty">Thêm câu hỏi để xem tóm tắt.</p></div>
+                </div>
+            </div>
+            <div class="alert alert-light mt-3 small text-secondary">
+                <strong class="text-dark">Mẹo:</strong> câu hỏi lựa chọn cần ít nhất 2 đáp án. Bạn có thể kéo thứ tự bằng các nút mũi tên.
+            </div>
+        </aside>
+    </div>
+</form>
+
+<script type="application/json" id="initialQuestions">@Html.Raw(Model.QuestionsJson)</script>
+@section Scripts {
+    <partial name="_ValidationScriptsPartial" />
+    <script src="~/js/survey-builder.js" asp-append-version="true"></script>
+}

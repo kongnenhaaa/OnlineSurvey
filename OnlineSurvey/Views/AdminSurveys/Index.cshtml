@@ -1,0 +1,114 @@
+@model List<Survey>
+@{
+    ViewData["Title"] = "Quản trị khảo sát";
+    var publishedCount = Model.Count(survey => survey.Status == "Published");
+    var draftCount = Model.Count - publishedCount;
+    var questionCount = Model.Sum(survey => survey.Questions.Count);
+}
+
+<div class="d-flex flex-wrap justify-content-between align-items-end gap-3 mb-4" data-reveal>
+    <div>
+        <span class="eyebrow">Không gian quản trị</span>
+        <h1 class="display-6 fw-bold mb-1">Khảo sát của bạn</h1>
+        <p class="text-secondary mb-0">Tạo form, kiểm soát trạng thái và theo dõi phản hồi.</p>
+    </div>
+    <a class="btn btn-primary px-3" asp-action="Create"><span aria-hidden="true">+</span> Tạo khảo sát</a>
+</div>
+
+<div class="row g-3 mb-4">
+    <div class="col-sm-4"><div class="metric-card metric-card-primary" data-reveal style="--reveal-delay: 50ms"><div class="metric-label">Tổng khảo sát</div><div class="metric-value" data-counter="@Model.Count">@Model.Count</div><div class="metric-trend">Kho dữ liệu hiện có</div></div></div>
+    <div class="col-sm-4"><div class="metric-card metric-card-success" data-reveal style="--reveal-delay: 100ms"><div class="metric-label">Đang mở</div><div class="metric-value text-success" data-counter="@publishedCount">@publishedCount</div><div class="metric-trend">Sẵn sàng nhận phản hồi</div></div></div>
+    <div class="col-sm-4"><div class="metric-card metric-card-violet" data-reveal style="--reveal-delay: 150ms"><div class="metric-label">Tổng câu hỏi</div><div class="metric-value" data-counter="@questionCount">@questionCount</div><div class="metric-trend">@draftCount bản nháp</div></div></div>
+</div>
+
+<div class="toolbar mb-3" data-reveal>
+    <div>
+        <strong>Danh sách khảo sát</strong>
+        <span class="text-secondary small ms-2" id="surveyCountLabel">@Model.Count mục</span>
+    </div>
+    <div class="input-group" style="max-width: 360px;">
+        <span class="input-group-text bg-white border-end-0 search-icon" aria-hidden="true"><svg viewBox="0 0 24 24"><circle cx="11" cy="11" r="7" /><path d="m20 20-4-4" /></svg></span>
+        <input class="form-control border-start-0" id="surveySearch" type="search" placeholder="Tìm theo tên hoặc đường dẫn..." aria-label="Tìm khảo sát" />
+    </div>
+</div>
+
+@if (Model.Count == 0)
+{
+    <div class="result-card p-5 text-center">
+        <div class="result-icon result-icon-info">✦</div>
+        <h2 class="h4">Chưa có khảo sát nào</h2>
+        <p class="text-secondary">Tạo khảo sát đầu tiên để bắt đầu thu thập ý kiến.</p>
+        <a class="btn btn-primary" asp-action="Create">Tạo khảo sát đầu tiên</a>
+    </div>
+}
+else
+{
+    <div class="survey-table bg-white" data-reveal>
+        <table class="table">
+            <thead><tr><th>Khảo sát</th><th>Trạng thái</th><th>Câu hỏi</th><th>Cập nhật</th><th class="text-end">Thao tác</th></tr></thead>
+            <tbody id="surveyRows">
+            @foreach (var survey in Model)
+            {
+                <tr data-survey-row data-search="@survey.Title @survey.Slug">
+                    <td>
+                        <strong>@survey.Title</strong>
+                        <div class="survey-code">/surveys/@survey.Slug</div>
+                    </td>
+                    <td>
+                        @if (survey.Status == "Published")
+                        {
+                            <span class="badge text-bg-success">Đang mở</span>
+                        }
+                        else
+                        {
+                            <span class="badge text-bg-secondary">Bản nháp</span>
+                        }
+                    </td>
+                    <td>@survey.Questions.Count</td>
+                    <td>@survey.UpdatedAt.ToLocalTime().ToString("dd/MM/yyyy HH:mm")</td>
+                    <td class="text-end text-nowrap">
+                        @if (survey.Status == "Published")
+                        {
+                            <a class="btn btn-sm btn-outline-success" target="_blank" asp-controller="Surveys" asp-action="Details" asp-route-slug="@survey.Slug">Mở</a>
+                        }
+                        <a class="btn btn-sm btn-outline-primary" asp-action="Edit" asp-route-id="@survey.Id">Sửa</a>
+                        <a class="btn btn-sm btn-outline-info" asp-action="Results" asp-route-id="@survey.Id">Kết quả</a>
+                        <form class="d-inline" asp-action="Publish" asp-route-id="@survey.Id" method="post">
+                            @Html.AntiForgeryToken()
+                            <button class="btn btn-sm btn-outline-warning" type="submit">@(survey.Status == "Published" ? "Đóng" : "Xuất bản")</button>
+                        </form>
+                        <form class="d-inline" asp-action="Delete" asp-route-id="@survey.Id" method="post" onsubmit="return confirm('Xóa khảo sát và toàn bộ câu trả lời?');">
+                            @Html.AntiForgeryToken()
+                            <button class="btn btn-sm btn-outline-danger" type="submit">Xóa</button>
+                        </form>
+                    </td>
+                </tr>
+            }
+            </tbody>
+        </table>
+    </div>
+    <div class="text-center text-secondary py-4 d-none" id="emptySearch">Không tìm thấy khảo sát phù hợp.</div>
+}
+
+@section Scripts {
+    <script>
+        (() => {
+            const input = document.getElementById('surveySearch');
+            const rows = [...document.querySelectorAll('[data-survey-row]')];
+            const label = document.getElementById('surveyCountLabel');
+            const empty = document.getElementById('emptySearch');
+            if (!input || rows.length === 0) return;
+            input.addEventListener('input', () => {
+                const query = input.value.trim().toLowerCase();
+                let visible = 0;
+                rows.forEach(row => {
+                    const match = row.dataset.search.toLowerCase().includes(query);
+                    row.classList.toggle('d-none', !match);
+                    if (match) visible++;
+                });
+                label.textContent = `${visible} mục`;
+                empty.classList.toggle('d-none', visible !== 0);
+            });
+        })();
+    </script>
+}

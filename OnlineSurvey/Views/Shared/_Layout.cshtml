@@ -1,0 +1,78 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>@ViewData["Title"] - OnlineSurvey</title>
+    <script>document.documentElement.classList.add('js');</script>
+    <script type="importmap"></script>
+    <link rel="stylesheet" href="~/lib/bootstrap/dist/css/bootstrap.min.css" />
+    <link rel="stylesheet" href="~/css/site.css" asp-append-version="true" />
+    <link rel="stylesheet" href="~/OnlineSurvey.styles.css" asp-append-version="true" />
+</head>
+<body>
+    <div class="ambient-background" aria-hidden="true">
+        <span class="ambient-orb ambient-orb-one"></span>
+        <span class="ambient-orb ambient-orb-two"></span>
+        <span class="ambient-orb ambient-orb-three"></span>
+        <span class="ambient-grid"></span>
+    </div>
+    <header>
+        <nav class="navbar navbar-expand-lg site-nav">
+            <div class="container">
+                <a class="navbar-brand d-flex align-items-center" asp-controller="Home" asp-action="Index">
+                    <span class="brand-mark">OS</span>
+                    OnlineSurvey
+                    <span class="brand-subtitle">Khảo sát trực tuyến</span>
+                </a>
+                <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#mainNavigation" aria-controls="mainNavigation" aria-expanded="false" aria-label="Mở menu">
+                    <span class="navbar-toggler-icon"></span>
+                </button>
+                <div class="collapse navbar-collapse" id="mainNavigation">
+                    <ul class="navbar-nav ms-auto align-items-lg-center gap-lg-2">
+                        <li class="nav-item"><a class="nav-link" asp-controller="Home" asp-action="Index">Trang chủ</a></li>
+                        <li class="nav-item"><a class="nav-link" asp-controller="AdminSurveys" asp-action="Index">Quản trị</a></li>
+                        @if (User.Identity?.IsAuthenticated == true)
+                        {
+                            <li class="nav-item ms-lg-2">
+                                <form asp-controller="Account" asp-action="Logout" method="post">
+                                    @Html.AntiForgeryToken()
+                                    <button type="submit" class="btn btn-sm btn-outline-secondary">Đăng xuất</button>
+                                </form>
+                            </li>
+                        }
+                        else
+                        {
+                            <li class="nav-item ms-lg-2"><a class="btn btn-sm btn-primary px-3" asp-controller="Account" asp-action="Login">Đăng nhập</a></li>
+                        }
+                    </ul>
+                </div>
+            </div>
+        </nav>
+    </header>
+
+    <div class="container page-shell">
+        @if (TempData["Success"] is string successMessage)
+        {
+            <div class="alert alert-success toast-alert d-flex align-items-center gap-2 mb-4" role="alert" data-toast>
+                <span class="toast-alert-icon" aria-hidden="true">✓</span><span>@successMessage</span>
+            </div>
+        }
+        <main role="main">
+            @RenderBody()
+        </main>
+    </div>
+
+    <footer class="site-footer py-4">
+        <div class="container d-flex flex-wrap justify-content-between gap-2 text-muted small">
+            <span>© 2026 OnlineSurvey</span>
+            <span>ASP.NET Core · MongoDB · Redis</span>
+        </div>
+    </footer>
+
+    <script src="~/lib/jquery/dist/jquery.min.js"></script>
+    <script src="~/lib/bootstrap/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="~/js/site.js" asp-append-version="true"></script>
+    @await RenderSectionAsync("Scripts", required: false)
+</body>
+</html>
