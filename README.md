@@ -45,7 +45,6 @@ ASP.NET Core MVC
 ~~~text
 OnlineSurvey/
 ├── OnlineSurvey.slnx
-├── docker-compose.yml
 ├── start-dependencies.ps1
 ├── README.md
 ├── .gitignore
@@ -69,31 +68,30 @@ OnlineSurvey/
 - .NET 8 SDK.
 - Visual Studio 2022 hỗ trợ .NET 8 hoặc VS Code.
 - Git nếu dùng GitHub.
-- Docker Desktop, khuyến nghị; hoặc MongoDB và Redis cài trực tiếp.
+- MongoDB Community Server hoặc MongoDB portable.
+- Redis Server tương thích chạy trực tiếp trên máy.
 - MongoDB Compass nếu muốn xem database bằng giao diện.
 
 ~~~powershell
 dotnet --version
 dotnet --list-sdks
 git --version
-docker --version
-docker compose version
 ~~~
 
 Project target `net8.0`. Nếu Visual Studio báo không hỗ trợ, hãy cập nhật Visual Studio 2022 và cài .NET 8 SDK.
 
-## 5. Chạy nhanh bằng Docker
+## 5. Chạy nhanh trên Windows
 
-Tại thư mục chứa `OnlineSurvey.slnx`:
+Sau khi đã cài MongoDB và Redis, mở PowerShell tại thư mục chứa `OnlineSurvey.slnx`:
 
 ~~~powershell
-docker compose up -d
-docker compose ps
-docker exec online-survey-mongodb mongosh --quiet --eval "db.adminCommand({ ping: 1 })"
-docker exec online-survey-redis redis-cli ping
+Set-ExecutionPolicy -Scope Process Bypass
+.\start-dependencies.ps1
+Test-NetConnection 127.0.0.1 -Port 27017
+Test-NetConnection 127.0.0.1 -Port 6379
 ~~~
 
-Redis phải trả về `PONG`.
+Hai kết quả `TcpTestSucceeded` cần là `True`.
 
 Tạo admin lần đầu và chạy web:
 
@@ -111,7 +109,7 @@ Username: admin
 Password: Admin@12345
 ~~~
 
-## 6. MongoDB và Redis cài trực tiếp
+## 6. Cài và chạy MongoDB, Redis trực tiếp
 
 Cổng mặc định:
 
@@ -129,7 +127,7 @@ Set-ExecutionPolicy -Scope Process Bypass
 .\start-dependencies.ps1
 ~~~
 
-Nếu đường dẫn cài trên máy mới khác, chỉnh `$mongoBin` và `$redisRoot` trong script. Docker Compose là cách ít phụ thuộc máy hơn.
+Script tự tìm `mongod.exe` và `redis-server.exe` trong `PATH`, thư mục cài đặt phổ biến và `%LOCALAPPDATA%`. Nếu không tìm thấy, thông báo lỗi sẽ chỉ rõ dịch vụ còn thiếu.
 
 ## 7. Cấu hình kết nối
 
@@ -399,8 +397,6 @@ Không đưa backup chứa dữ liệu cá nhân hoặc credential thật lên r
 ~~~powershell
 Test-NetConnection 127.0.0.1 -Port 27017
 Test-NetConnection 127.0.0.1 -Port 6379
-docker compose logs mongodb
-docker compose logs redis
 Get-NetTCPConnection -LocalPort 27017,6379,5080,7124 -ErrorAction SilentlyContinue
 ~~~
 
@@ -411,20 +407,14 @@ Nếu không đăng nhập được:
 - Tài khoản demo: `admin / Admin@12345`.
 - Biến bootstrap chỉ hoạt động khi `admins` rỗng.
 
-## 17. Docker lifecycle
+## 17. Dừng MongoDB và Redis local
 
 ~~~powershell
-docker compose stop
-docker compose down
+Get-Process mongod, redis-server -ErrorAction SilentlyContinue
+Stop-Process -Name mongod, redis-server
 ~~~
 
-Hai lệnh trên không xóa volume. Muốn xóa toàn bộ database Docker:
-
-~~~powershell
-docker compose down -v
-~~~
-
-Lệnh cuối xóa dữ liệu local trong volume.
+Lệnh dừng process không xóa dữ liệu. MongoDB portable của script lưu dữ liệu trong `%LOCALAPPDATA%\MongoDB\data\OnlineSurvey`.
 
 ## 18. Build và publish
 
@@ -454,7 +444,8 @@ Máy khác:
 ~~~powershell
 git clone https://github.com/USERNAME/REPOSITORY.git
 cd REPOSITORY
-docker compose up -d
+Set-ExecutionPolicy -Scope Process Bypass
+.\start-dependencies.ps1
 dotnet restore .\OnlineSurvey.slnx
 $env:ONLINE_SURVEY_ADMIN_USERNAME = "admin"
 $env:ONLINE_SURVEY_ADMIN_PASSWORD = "Admin@12345"
@@ -476,17 +467,7 @@ dotnet run --project .\OnlineSurvey\OnlineSurvey.csproj --launch-profile http
 - [ ] Không commit secret, `.vs`, `bin`, `obj`.
 - [ ] Đổi mật khẩu demo trước khi public.
 
-## 21. Bảo mật
-
-- Không commit connection string có password.
-- Dùng HTTPS khi deploy.
-- Giữ anti-forgery và server validation.
-- Dùng MongoDB user có quyền tối thiểu.
-- Đổi mật khẩu demo.
-- Backup database định kỳ.
-- Production cần giám sát Redis và có rate-limit dự phòng.
-
-## 22. Trạng thái dự án
+## 21. Trạng thái dự án
 
 Project có đầy đủ MVC source, UI Razor, đăng nhập admin, form builder, MongoDB repository, Redis cache/rate limit, thống kê và CSV.
 
