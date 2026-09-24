@@ -50,6 +50,7 @@ OnlineSurvey/
 ├── README.md
 ├── .gitignore
 ├── database/
+│   ├── OnlineSurvey-Schema.mongodb.js
 │   └── OnlineSurvey-Database-Day-Du.mongodb.js
 └── OnlineSurvey/
     ├── OnlineSurvey.csproj
@@ -241,6 +242,14 @@ dotnet dev-certs https --trust
 6. Cookie chống gửi lại tồn tại 10 phút.
 
 ## 12. MongoDB
+
+File schema dễ đọc, tương đương phần `CREATE TABLE` của SQL:
+
+~~~powershell
+mongosh "mongodb://127.0.0.1:27017/OnlineSurvey" --file ".\database\OnlineSurvey-Schema.mongodb.js"
+~~~
+
+File này không xóa và không chèn dữ liệu. Nó tạo hoặc cập nhật ba collection, JSON Schema validator và index. File `OnlineSurvey-Database-Day-Du.mongodb.js` là bản backup có đầy đủ dữ liệu mẫu.
 
 ~~~text
 OnlineSurvey
